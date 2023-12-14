@@ -123,11 +123,11 @@ The following script will use the environmental variables created above and choo
 --copy my.registry.url
 ```
 
-**Note: The container registry URL is only the base URL.  The image name and tag (the version) are copied from the CrowdStrike registry automatically.**
+**Note: The container registry URL is only the base URL.  The image _name_ and _tag_ (the version) are copied from the CrowdStrike registry automatically.**
 
 ## The Falcon Node Sensor
 
-Notice that the `--type` is `falcon-sensor`.
+Notice that the `--type` is `falcon-sensor` for both the node-based sensor and the container-based (sidecar) sensor.
 
 When **node** and **container** images are copied from the CrowdStrike registry, they both get the name `falcon-sensor`. 
 The **tag** for the `falcon-container` image includes the word _container_.
