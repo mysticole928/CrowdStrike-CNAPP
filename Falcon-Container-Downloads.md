@@ -129,10 +129,8 @@ The following script will use the environmental variables created above and choo
 
 Notice that the `--type` is `falcon-sensor` for both the node-based sensor and the container-based (sidecar) sensor.
 
-When **node** and **container** images are copied from the CrowdStrike registry, they both get the name `falcon-sensor`. 
+When **node** and **container** images are pulled from the CrowdStrike registry, they both have the name `falcon-sensor`. 
 The **tag** for the `falcon-container` image includes the word _container_.
-
-This tag is used when deploying sensors.
 
 ### List Available Versions
 
@@ -148,6 +146,8 @@ This tag is used when deploying sensors.
 
 ### Download the current node sensor and save it to the local container registry
 
+In these examples, the `--type` is `falcon-sensor`.
+
 ```bash
 ./falcon-container-sensor-pull.sh \
 --client-id $FALCON_CLIENT_ID \
@@ -157,7 +157,7 @@ This tag is used when deploying sensors.
 --platform x86_64
 ```
 
-### Download current node sensor and copy it to a specific registry
+### Pull current node sensor and copy it to a specific registry
 
 ```bash
 ./falcon-container-sensor-pull.sh \
@@ -166,14 +166,14 @@ This tag is used when deploying sensors.
 --region $FALCON_CLOUD_REGION \
 --type falcon-sensor \
 --platform x86_64 \
---copy myregistry.url.com # <-- No namespace or tag
+--copy myregistry.url.com # <-- No repository or tag
 ```
 
 ## The Container Sensor
 
-Notice that, in these examples, the `--type` is `falcon-container`.
+In these examples, the `--type` is `falcon-container`.
 
-### Copy the current container sensor and save it to the local container registry
+### Pull the current container sensor and save it to the local container registry
 
 ```bash
 ./falcon-container-sensor-pull.sh \
@@ -184,7 +184,7 @@ Notice that, in these examples, the `--type` is `falcon-container`.
 --platform x86_64
 ```
 
-### Copy the most current container sensor to a specific registry
+### Pull the most current container sensor to a specific registry
 
 ```bash
 ./falcon-container-sensor-pull.sh \
@@ -193,7 +193,7 @@ Notice that, in these examples, the `--type` is `falcon-container`.
 --region $FALCON_CLOUD_REGION \
 --type falcon-container \
 --platform x86_64 \
---copy myregistry.url.com # <-- No namespace or tag
+--copy myregistry.url.com # <-- No repository or tag name
 ```
 
 
