@@ -26,13 +26,13 @@ Someone that created an environment will know its contents and how to connect to
 Start by probing a region for running EC2 instances.
 
 ```bash
-aws [--profile <profile-name>] ec2 describe-instances \
+aws --profile <profile-name> ec2 describe-instances \
 --region <aws-region> \
 --filters "Name=instance-state-name, Values=running" \
 --output yaml
 ```
 
-If the AWS CLI has multiple profiles, use `--profile` to choose the correct one.  _This is optional_.
+If the AWS CLI has multiple profiles, use `--profile` to choose the correct one.  _This is optional_.  
 
 The `--filters` argument t does server-side filtering by the AWS API and only returns the records that match the filter.
 
@@ -47,7 +47,7 @@ A bad actor might run this command in several regions looking for running instan
 Once a running instance has been found, get its security group.
 
 ```bash
-aws [--profile <profile-name>] ec2 describe-instances \
+aws --profile <profile-name> ec2 describe-instances \
 --region <aws-region> \
 --filters "Name=instance-state-name, Values=running" \
 --max-items 1 \
@@ -70,7 +70,7 @@ The `--output` is `json`.  This output gets piped ( `\` ) to `jq` and returns th
 To raise the FCS score, use the AWS CLI to get information about the security group.
 
 ```bash
-aws [--profile <profile-name>] ec2 describe-security-groups \
+aws --profile <profile-name> ec2 describe-security-groups \
 --region <aws-region> \
 --group-id sg-################# \
 --output yaml
@@ -80,7 +80,7 @@ Remember, IOAs are based on behavior.  While this command doesn't change an envi
 
 Similarly, this command returns the AWS meta-data tags attached to the security group.
 
-aws [--profile <profile-name>] ec2 describe-tags \
+aws --profile <profile-name> ec2 describe-tags \
 --region <aws-region> \
 --filters "Name=resource-id, Values=sg-#################" \
 --output yaml
@@ -106,7 +106,7 @@ Opening ports 80 and 3389 to production based environments is an RBE for most or
 RBE: _**Resume Building Event**_
 
 ```bash
-aws [--profile <profile-name>] ec2 authorize-security-group-ingress \
+aws --profile <profile-name> ec2 authorize-security-group-ingress \
 --region <aws-region> \
 --group-id sg-################# \
 --protocol tcp \
@@ -115,7 +115,7 @@ aws [--profile <profile-name>] ec2 authorize-security-group-ingress \
 ```
 
 ```bash
-aws [--profile <profile-name>] ec2 authorize-security-group-ingress \
+aws --profile <profile-name> ec2 authorize-security-group-ingress \
 --region <aws-region> \
 --group-id sg-################# \
 --protocol tcp \
@@ -136,7 +136,7 @@ Depending on how often the assessments are run (every 2, 6, 12, or 24 hours), le
 Leaving these ports open, even for a short time, makes an environment vulnerable to attack/compromise.  Revoke access as quickly as possible.
 
 ```bash
-aws [--profile <profile-name>] ec2 revoke-security-group-ingress \
+aws --profile <profile-name> ec2 revoke-security-group-ingress \
 --region <aws-region> \
 --group-id sg-################# \
 --protocol tcp \
@@ -145,7 +145,7 @@ aws [--profile <profile-name>] ec2 revoke-security-group-ingress \
 ```
 
 ```bash
-aws [--profile <profile-name>] ec2 revoke-security-group-ingress \
+aws --profile <profile-name> ec2 revoke-security-group-ingress \
 --region <aws-region> \
 --group-id sg-################# \
 --protocol tcp \
