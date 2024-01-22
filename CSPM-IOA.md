@@ -10,8 +10,8 @@ It uses the AWS Command Line tools and the program `jq`.
 
 `jq` is a lightweight and flexible command-line JSON processor.
 
-AWS CLI: [https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-`jq`: [https://jqlang.github.io/jq/](https://jqlang.github.io/jq/)
+- AWS CLI: [https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- `jq`: [https://jqlang.github.io/jq/](https://jqlang.github.io/jq/)
 
 To trigger the IOA, have at least one EC2 instance running and permission to change its security group.
 
