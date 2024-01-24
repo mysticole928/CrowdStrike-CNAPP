@@ -40,7 +40,7 @@ The `--output` argument is optional and is used to make the text easier to read.
 
 A bad actor might run this command in several regions looking for running instances. Running this command in several regions increases the likelihood that FCS will score the ativity higher.  
 
-(Higher scores in FCS are more severe.)
+The trick to getting a higher (more critical) score is to precede the “attack” with `DescribeSecurityGroups` or `DescribeInstances` and follow it with `DescribeInstances`.
 
 ## Get a Specific Security Group
 
