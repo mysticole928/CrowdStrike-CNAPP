@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # 2024-01-26 
+# Author: Stephen Cole
 #
 # Simple python3 script that will process all the yaml files in the
 # current directory and run: kubectl delete -f <filename>
