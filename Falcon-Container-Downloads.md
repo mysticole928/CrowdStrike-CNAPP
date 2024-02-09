@@ -5,6 +5,7 @@ Created: 2023-11-15
 Updated: 
 
 2024-02-02 - Added information about the falcon-imageanayzer
+2024-02-08 - Fixed an instruction about excluding the `--platform' argument when download the Image Analyzer
 
 
 It's possible to download the latest **Falcon Container Sensor**, the **Falcon Node Sensor**, the **Falcon Kubernetes Admission Controller**, the **Falcon Kubernetes Protection Agent**, and the **Falcon Image Analyzer** from the **CrowdStrike** container registry.
@@ -84,7 +85,7 @@ If the `--type` option is omitted it will default to `falcon-container`.
 
 The `--runtime` option defaults to `docker`
 
-When downloading the `falcon-imageanalyzer` omit the `--type` option.
+When downloading the `falcon-imageanalyzer` omit the `--platform` option.
 
 **To avoid confusion, always specify the sensor type to download.**
 
@@ -244,5 +245,5 @@ To see the verison information, use the `--list-tags` option.
 --type falcon-imageanalyzer
 ```
 
-Note: Omit the `--type` and `--platform` options.
+Note: Omit the `--platform` option.
 
