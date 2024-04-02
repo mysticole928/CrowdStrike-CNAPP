@@ -120,14 +120,14 @@ kubectl get deployments,pods -n falcon-kac
 This will display the deployment: `falcon-kac`.
 It will also show a pod name that starts with `falcon-kac`.  
 
-An agent ID (AID) is assigned to the Falcon KaC when it communicates with the Falcon cloud.
+An agent ID (AID) is assigned to the Falcon KAC when it communicates with the Falcon cloud.
 
 If the Falcon KAC has a valid AID, this means it has been installed and is running properly.
 
 To view the AID use this command:
 
 ```bash
-kubectl exec deployment/falcon-kac -n falcon-kac -c falon-ac -- falconctl -g --aid
+kubectl exec deployment/falcon-kac -n falcon-kac -c falcon-ac -- falconctl -g --aid
 ```
 
 `kubectl` options:
