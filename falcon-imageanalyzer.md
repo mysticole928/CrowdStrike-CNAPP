@@ -1,6 +1,7 @@
 # Falcon Image Analyzer
 
 Created: 2024-02-12
+Updated: 2024-04-02 Fixed some typos and changed filename.
 
 This feature is offically called the **Image Assessment at Runtime** or **IAR**.
 
@@ -37,7 +38,7 @@ Change these values to the appropriate ones.
 ```bash
 export FALCON_CID=1234567890-12
 export FALCON_CLIENT_ID=abcdef0123456789
-export FALCON_CLIENT_SECRETabcdef0123456789
+export FALCON_CLIENT_SECRE=Tabcdef0123456789
 export FALCON_CLOUD_REGION=us-1
 export FALCON_CLOUD_API=api.crowdstrike.com
 ```
