@@ -2,9 +2,11 @@
 ## Kubernetes Admission Controller Helm Chart
 ## Falcon KAC
 
-_Updated: 2023-12-13_
+_Updated: 2024-04-26_
 
-The official repo for the CrowdStrike helm charts is on github.  
+Minor edits to fix typos, added additional information for troubleshooting, and included an example of helm install with `falcon.tags`. 
+
+The official repo for the CrowdStrike Kubernetes Admission Controller helm charts is on github.  
 
 Here is the URL:
 
@@ -143,12 +145,62 @@ The `falcontl` option `-g` will GET information from the sensor.
 - `--aid`: The Agent ID (AID)
 - `--cid`: The Cusomter ID (CID) without the checksum
 
-## View the logs from a Kubenetes POD
+## View the logs
 
 To view the rolling logs from a Kubernetes pod use the `logs` command
 with `kubectl`.
 
+This is the format of the `kubectl logs` command
+
 ```bash
 kubectl logs -f [POD-NAME] -n NAMESPACE
 ```
+
+To get the most recent Falcon KAC logs:
+
+```bash
+kubectl logs -l app=falcon-kac -n falcon-kac --all-containers --tail=-1
+```
+
+Get the most recent Falcon KAC log entries and save them to a file name `falcon-kac.log`:
+
+```bash
+kubectl logs -l app=falcon-kac -n falcon-kac --all-containers --tail=-1 > falcon-kac.log
+```
+
+## Gather information about all falcon-kac resources
+
+```bash
+kubectl get all -n falcon-kac
+```
+
+## Get the Kubernetes cluster ID
+
+The `ClusterId` can be used instead of `ClusterName` to search both the Host Management UI and the Kubernetes IOM UI.
+
+```bash
+kubectl get ns kube-system --output=jsonpath={.metadata.uid}
+```
+
+## Use Falcon Tags to create dynamic Host Groups for Falcon Admissions Control Policies
+
+Instead of depending on the Kubernetes hostname to create a dynamic Host Group, it's possible to add a Falcon Tag to the Falcon KAC.
+
+When using a Helm chart, tags are added with the `--set` option and `falcon.tags`.
+
+Multiple tags can be added in a single statement.  They are separated with commas (`,`) that must be escaped with a backslash (`\`) character.
+
+For example: `--set falcon.tags="tag-1\,tag-2\,tag-3"
+
+Here's the `helm` command with tags added.
+
+```bash
+helm upgrade --install falcon-kac crowdstrike/falcon-kac \
+     -n falcon-kac --create-namespace \
+     --set falcon.cid=$FALCON_CID \
+     --set image.repository=$FALCON_REPO \
+     --set image.tag=$FALCON_IMAGE_TAG \
+     --set falcon.tags="eks-cluster"
+```
+
 
