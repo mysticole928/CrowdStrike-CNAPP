@@ -101,7 +101,7 @@ oooooooooooo oooooo     oooo oooooooooooo ooooooooo.
 o888ooooood8       `8'       o888ooooood8 o888o  o888o
 ```
 
-Opening ports 80 and 3389 to production based environments is an RBE for most organizations.
+Opening ports 22 and 3389 to production based environments is an RBE for most organizations.
 
 RBE: _**Resume Building Event**_
 
