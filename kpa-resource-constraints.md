@@ -63,7 +63,7 @@ kubectl patch deployment -n falcon-kubernetes-protection kpagent-cs-k8s-protecti
 Here's `json` from the above command that can be saved as a file.
 
 ```json
-
+[
   {
     "op": "remove",
     "path": "/spec/template/spec/containers/0/resources"
