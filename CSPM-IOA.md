@@ -80,10 +80,12 @@ Remember, IOAs are based on behavior.  While this command doesn't change an envi
 
 Similarly, this command returns the AWS meta-data tags attached to the security group.
 
+```shell
 aws --profile <profile-name> ec2 describe-tags \
 --region <aws-region> \
 --filters "Name=resource-id, Values=sg-#################" \
 --output yaml
+```
 
 ## Change the Security Group Rules to Allow Access from the Public Interenet
 
