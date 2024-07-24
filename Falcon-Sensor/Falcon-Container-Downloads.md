@@ -6,6 +6,7 @@ Updated:
 
 2024-02-02 - Added information about the falcon-imageanayzer
 2024-02-08 - Fixed an instruction about excluding the `--platform' argument when download the Image Analyzer
+2024-07-24 - Moved to new directory.  Will be separating out the content in the near future.
 
 
 It's possible to download the latest **Falcon Container Sensor**, the **Falcon Node Sensor**, the **Falcon Kubernetes Admission Controller**, the **Falcon Kubernetes Protection Agent**, and the **Falcon Image Analyzer** from the **CrowdStrike** container registry.
