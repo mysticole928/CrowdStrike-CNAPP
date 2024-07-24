@@ -2,8 +2,10 @@
 ## Kubernetes Admission Controller Helm Chart
 ## Falcon KAC
 
-_Updated: 2024-04-26_
+Updated: 2024-07-24
+Moved to new folder for navigation/readability.  Eventually, the Helm information will be split from this file and moved into its own folder.
 
+Updated: 2024-04-26
 Minor edits to fix typos, added additional information for troubleshooting, and included an example of helm install with `falcon.tags`. 
 
 The official repo for the CrowdStrike Kubernetes Admission Controller helm charts is on github.  
