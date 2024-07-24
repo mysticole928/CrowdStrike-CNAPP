@@ -1,11 +1,18 @@
 # CrowdStrike CNAPP Notes and Observations
 
-_Updated: 2024-01-22_
-
-I've renamed this repo because some of my notes are going to include information about CSPM (Cloud Security Posture Management) along with CWP (Cloud Workload Protection) inside Falcon.
-
-Eventually, this will include ASPM, Application Security Posture Management.  ASPM is agentless application discovery and mapping for cloud-based workloads that includes a real-time inventory into every microservice, database, API, and dependencies.
+Updated: 2024-01-22
 
 These are my *personal* notes, insights, and refelctions from working with CrowdStrike Falcon.
 
-All of these materials come from public-facing documentation.  Most of the annotations are for people that are new to Falcon, Kubernetes, and cloud computing.
+They are presented "as is" and could _easily_ be out of date.  All information in this repository 
+cam from from public-facing documentation.
+
+_Unless I forgot to do it_, links to that public-facing documentation are included.
+
+Most of the annotations are for people that are new to Falcon, Kubernetes, and cloud computing.
+
+> [!CAUTION]
+>
+> The information contained herein has been obtained from sources believed to be reliable. However, no warranty as to the accuracy, completeness or adequacy of such information is implied. No liability is accepted for errors, omissions or inadequacies in the information contained herein or for interpretations thereof. The reader assumes sole responsibility for the selection of these materials to achieve its intended results. The opinions expressed herein are subject to change without notice.
+> 
+> Read at your own risk. Ask your doctor or pharmacist. Parental guidance advised. Always read the label. Do not use while operating a motor vehicle or heavy equipment. Do not stamp. Breaking seal constitutes acceptance of agreement. Contains non-milk fat. Date as postmark. Lost ticket pays maximum rate. Use only in well-ventilated area. Price does not include taxes. Not for resale. Hand wash only. Keep away from sunlight. For a limited time only. No preservatives or additives. Keep away from pets and small children. Safety goggles required during use. If rash, irritation, redness, or swelling develops, discontinue use. Do not fold, spindle or mutilate. Please remain seated until the web page has come to a complete stop. Refrigerate after opening. Flammable. Must be 18 years or older. Seat backs and tray tables must be in the upright position. Repeat as necessary. Do not look directly into light. Avoid extreme temperatures and store in a cool dry place. No salt, MSG, artificial colouring or flavoring added. Reproduction strictly prohibited. Pregnant women, the elderly, and children should avoid prolonged exposure to this product. If ingested, do not induce vomiting. May contain nuts. Objects in mirror may be closer than they appear. Do not use if safety seal is broken.
