@@ -2,7 +2,9 @@
 
 These are notes based on my personal experieces.
 
-> [!IMPORTANT] The information here is _probably_ out of date
+> [!IMPORTANT]
+>
+> **The information here is _probably_ out of date.**
 >
 > Like all things in technology, instructions like these get stale fast.
 > 
