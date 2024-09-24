@@ -10,9 +10,11 @@ The `falcon-kac-output.sh` makes it easier to read and saves the contents to a l
 
 <img width="1000" alt="Falcon-KAC-Warnings" src="https://github.com/user-attachments/assets/019af04b-b755-4981-9e95-afe5f320a3f2">
 
+
 ## The Preventions
 
 <img width="1000" alt="Falcon-KAC-Preventions" src="https://github.com/user-attachments/assets/21eb50b9-d995-4661-94a8-562ba6c15a10">
+
 
 ## Running the Script
 
