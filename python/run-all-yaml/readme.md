@@ -1,6 +1,6 @@
-# Run All YAML
+# Run all YAML files
 
-The python scripts in this folder will run or all the kubernetes `yaml` files in a given directory.
+The python scripts in this folder will run or all the kubernetes `yaml` files in a directory.
 
 They are used to build or tear down my lab evironment and are rudimentary.  There is no error checking or advanced processing.
 
