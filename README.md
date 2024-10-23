@@ -1,6 +1,10 @@
 # CrowdStrike CNAPP Notes and Observations
 
-Updated: 2024-01-22
+Updated: 2024-10-22
+
+Added information about the KAC installation process.
+
+## No Warranty Implied or Otherwise
 
 These are my *personal* notes, insights, and refelctions from working with CrowdStrike Falcon.
 
