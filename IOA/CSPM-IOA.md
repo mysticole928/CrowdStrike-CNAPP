@@ -182,7 +182,9 @@ export INSTANCE_ID=$(aws ec2 describe-instances \
 
 ---
 
-> [!Note] **CLI: Pro-Tip**
+> [!Note]
+>
+> **CLI: Pro-Tip**
 > 
 > The linux `history` feature has a shortcut that repeats the last command. The shortcut is: `!!`
 > 
