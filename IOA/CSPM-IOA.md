@@ -182,7 +182,7 @@ export INSTANCE_ID=$(aws ec2 describe-instances \
 
 ---
 
-> [!Pro Tip]
+> [!Note] **CLI: Pro-Tip**
 > 
 > The linux `history` feature has a shortcut that repeats the last command. The shortcut is: `!!`
 > 
@@ -448,5 +448,5 @@ aws ec2 revoke-security-group-ingress \
     --cidr 0.0.0.0/0
 ```
 
-As with the authorize command, when successful, the output will contain: `Return: true`.
+As with the authorize command, when successful, the output contains: `Return: true`.
 
