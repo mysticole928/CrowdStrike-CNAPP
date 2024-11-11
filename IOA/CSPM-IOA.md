@@ -87,7 +87,7 @@ export AWS_REGION="ca-central-1"
 
 When setting shell variables, quotation marks are _not_ required. However, using them can help prevent unexpected behavior.
 
-### Initial Reconnisance
+### Initial Reconnaissance
 
 List the running instances in a region.
 
