@@ -1,156 +1,452 @@
-# Trigger an IOA from the CLI
+# CLOUD-223: Trigger an IOA in AWS
 
-2024-01-24
+Updated: 2024-11-11
 
-## Introduction
+**Objective**:
 
-This document describes how to trigger an Indicator of Attack (IOA) inside Falcon Cloud Security (FCS) CSPM.  
+This document contains the steps needed to intentionally trigger an Indicator of Attack (IOA) in Falcon Cloud Security.
 
-It uses the AWS Command Line tools and the program `jq`.
+The "attack" portion of this exercise opens several ports in an EC2 security group. Two of them are management ports (22 and 3389) that generate Indicators of Misconfigurations (IOMs).
 
-`jq` is a lightweight and flexible command-line JSON processor.
+---
+> 
+> ⚠️ **Danger!**
+>
+> Some of these commands modify security settings.
+>
+> **Before you begin**, ensure you are authorized to make these changes in your environment.
+>
+> ☠️ **Proceed with caution.**
+>
+---
 
-- AWS CLI: [https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-- `jq`: [https://jqlang.github.io/jq/](https://jqlang.github.io/jq/)
+The IOA: **EC2 security group modified to allow ingress from the public internet**
 
-To trigger the IOA, have at least one EC2 instance running and permission to change its security group.
+The attack pattern includes:
 
-## Think Like a Bad Actor
+- Performing reconnaissance (e.g., `ec2:DescribeSecurityGroups`, `ec2:DescribeInstances`)
+- Modifying security groups (`ec2:AuthorizeSecurityGroupIngress`)
+- Verifying the modifications (`ec2:DescribeSecurityGroups`)
 
-The way this works is to behave like a bad actor.  A bad actor is--very likely--going to probe an environment to see what's inside.  
+## Prerequisites
 
-Someone that created an environment will know its contents and how to connect to them.
+1. **AWS Resources**
 
-## Find Running EC2 Instances
+   - A running EC2 instance
+   - AWS CLI version 2 installed
 
-Start by probing a region for running EC2 instances.
+2. **Required IAM Permissions**
 
-```bash
-aws --profile <profile-name> ec2 describe-instances \
---region <aws-region> \
---filters "Name=instance-state-name, Values=running" \
---output yaml
-```
+   - `ec2:DescribeInstances`: List EC2 instances
+   - `ec2:DescribeSecurityGroups`: Retrieve security group details
+   - `ec2:AuthorizeSecurityGroupIngress`: Add inbound rules
+   - `ec2:RevokeSecurityGroupIngress`: Remove inbound rules
 
-If the AWS CLI has multiple profiles, use `--profile` to choose the correct one.  _This is optional_.  
+3. **Shell Variables**
+   - `AWS_PROFILE`: AWS CLI profile
+   - `AWS_REGION`: AWS region
 
-The `--filters` argument t does server-side filtering by the AWS API and only returns the records that match the filter.
+### The AWS CLI
 
-The `--output` argument is optional and is used to make the text easier to read.  `--output` values include `yaml`, `json`, `text`, and `table` 
+For information about the AWS CLI and how to download/configure it:
 
-A bad actor might run this command in several regions looking for running instances. Running this command in several regions increases the likelihood that FCS will score the ativity higher.  
+[https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
-The trick to getting a higher (more critical) score is to precede the “attack” with `DescribeSecurityGroups` or `DescribeInstances` and follow it with `DescribeInstances`.
+### Shell Variables
 
-## Get a Specific Security Group
+When creating shell variables, use the `export` keyword. This ensures variables are copied to any new shells spawned.
 
-Once a running instance has been found, get its security group.
-
-```bash
-aws --profile <profile-name> ec2 describe-instances \
---region <aws-region> \
---filters "Name=instance-state-name, Values=running" \
---max-items 1 \
---query "Reservations[].Instances[].SecurityGroups[].GroupId[]" \
---output json | jq -r '.[]'
-```
-
-This command is similar to the previous one.  
-
-It uses the `--filter` arguement to do a server-side filter.  The `--query` arguement is a client-side filter.
-
-`--max-items` returns only the first item.
-
-The `--query` argument uses `json` to return the AWS security group id.  It has the prefix of `sg-`.
-
-The `--output` is `json`.  This output gets piped ( `\` ) to `jq` and returns the security group id.
-
-## Get Information About the Security Group
-
-To raise the FCS score, use the AWS CLI to get information about the security group.
-
-```bash
-aws --profile <profile-name> ec2 describe-security-groups \
---region <aws-region> \
---group-id sg-################# \
---output yaml
-```
-
-Remember, IOAs are based on behavior.  While this command doesn't change an environment, it is something that a bad actor might do to get more information about an environment.
-
-Similarly, this command returns the AWS meta-data tags attached to the security group.
+For example:
 
 ```shell
-aws --profile <profile-name> ec2 describe-tags \
---region <aws-region> \
---filters "Name=resource-id, Values=sg-#################" \
---output yaml
+export AWS_REGION="us-east-1"
 ```
 
-## Change the Security Group Rules to Allow Access from the Public Interenet
+To verify the value of a shell variable, use the `echo` command and include a dollar sign (`$`) in front of the varible name.
 
-**WARNING**: This step changes the security group's inbound rules to give ports 80 and 3389 access to the public Internet.
-
-**###### DO NOT DO THIS TO ANY TYPE OF PRODUCTION ENVIRONMENT ######**
-
-```
-oooooooooooo oooooo     oooo oooooooooooo ooooooooo.   
-`888'     `8  `888.     .8'  `888'     `8 `888   `Y88. 
- 888           `888.   .8'    888          888   .d88' 
- 888oooo8       `888. .8'     888oooo8     888ooo88P'  
- 888    "        `888.8'      888    "     888`88b.    
- 888       o      `888'       888       o  888  `88b.  
-o888ooooood8       `8'       o888ooooood8 o888o  o888o
+```shell
+echo $AWS_REGION
 ```
 
-Opening ports 22 and 3389 to production based environments is an RBE for most organizations.
+Alternatively, use the `env` command to list all current shell variables. Pipe the output through `sort` to make values easy to find.
 
-RBE: _**Resume Building Event**_
-
-```bash
-aws --profile <profile-name> ec2 authorize-security-group-ingress \
---region <aws-region> \
---group-id sg-################# \
---protocol tcp \
---port 3389 \
---cidr 0.0.0.0/0
+```shell
+env | sort
 ```
 
-```bash
-aws --profile <profile-name> ec2 authorize-security-group-ingress \
---region <aws-region> \
---group-id sg-################# \
---protocol tcp \
---port 22 \
---cidr 0.0.0.0/0
+## Shell Commands
+
+### Set Shell Variables
+
+These commands set the `AWS_PROFILE` and `AWS_REGION` values for the session:
+
+```shell
+export AWS_PROFILE="cloud-223"
+export AWS_REGION="ca-central-1"
 ```
 
-The `--cidr` address `0.0.0.0/0` is the public Internet.
+When setting shell variables, quotation marks are _not_ required. However, using them can help prevent unexpected behavior.
 
-## Change the Security Group Rules to DENY Access from the Public Internet
+### Initial Reconnisance
 
-Revoke public access via this security group as quickly as possible.
+List the running instances in a region.
 
-Inside FCS/CSPM, public access to ports 80 and 3389 is also an IOM.  (Indicator of Misconfiguration) 
-
-Depending on how often the assessments are run (every 2, 6, 12, or 24 hours), leave these ports open to see it inside FCS.  
-
-Leaving these ports open, even for a short time, makes an environment vulnerable to attack/compromise.  Revoke access as quickly as possible.
-
-```bash
-aws --profile <profile-name> ec2 revoke-security-group-ingress \
---region <aws-region> \
---group-id sg-################# \
---protocol tcp \
---port 3389 \
---cidr 0.0.0.0/0
+```shell
+aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --filters "Name=instance-state-name, Values=running" \
+    --query 'Reservations[*].Instances[*].{
+        Name: (Tags[?Key==`Name`] | [0].Value) || `No Name`,
+        PublicIpAddress: PublicIpAddress,
+        PrivateIpAddress: PrivateIpAddress,
+        SecurityGroups: SecurityGroups[*].GroupId,
+        InstanceId: InstanceId
+    }' \
+    --output yaml
 ```
 
-```bash
-aws --profile <profile-name> ec2 revoke-security-group-ingress \
---region <aws-region> \
---group-id sg-################# \
---protocol tcp \
---port 22 \
---cidr 0.0.0.0/0
+This command retrieves a list of running EC2 instances in an AWS Region.
+
+#### The `--filter` Parameter
+
+`--filter` is a server-side directive that tells AWS to only return information from instances in a `running` state.
+
+Other states (such as `stopped`, `terminated`, and `pending`) are excluded.
+
+#### The `--query` Parameter
+
+The `--query` parameter uses `JMESPath` syntax on the client-side to parse/select specific fields. It also formats the output.
+
+- `Name`: Finds the instance tag with the key `Name` and displays its value. If no Name tag is set, it defaults to `No Name`.
+- `PublicIpAddress`: Displays the public IP address of the instance, if available.
+- `PrivateIpAddress`: Shows the private IP address of the instance.
+- `SecurityGroups`: Lists the security group IDs associated with the instance.
+
+The command `aws ec2 describe-instances` returns a JSON object that includes a list of `Reservations` and `Instances`.
+
+EC2 `Reservations` primarily refer to cost and commitment structures. The main types are on-demand, reserved, savings plans, spot, dedicated, and capacity.
+
+Within each `Reservation` is an `Instances` array. This array contains information about each EC2 instance with the reservation.
+
+`Reservations[*].Instances[*]` returns a list of all the reservations and instances.
+
+There are multiple ways to limit the output to a single instance. In this example, replace the asterisks (`*`) in `Reservations` and `Instances` with the number `0`.
+
+> **Note**: The AWS CLI has a parameter `--max-items` that should limit the output to a single entry.  However, in this case, it won't work as expected. 
+> 
+> This is because the `--max-items` flag applies to the *number of items* returned by the command *at the top level* and **not** individual responses within reservations. 
+>  
+>  Using `--max-items 1` does return a single item.  When the command has *multiple* top-level matches, they are returned even when `null`.  The extra lines interfere with the following step that assigns the value to a shell variable.
+> 
+> Choosing the first value of the array is safer.
+
+```shell
+aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --filters "Name=instance-state-name, Values=running" \
+    --query 'Reservations[0].Instances[0].{
+        Name: (Tags[?Key==`Name`] | [0].Value) || `No Name`,
+        PublicIpAddress: PublicIpAddress,
+        PrivateIpAddress: PrivateIpAddress,
+        SecurityGroups: SecurityGroups[*].GroupId,
+        InstanceId: InstanceId
+    }' \
+    --output yaml
 ```
+
+AWS does **not** guarantee the order of data. When there are multiple EC2 instances in an array, it is possible the output order will change every time the command runs.
+
+To address this, put the Instance ID in a shell variable.
+
+```shell
+aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --filters "Name=instance-state-name, Values=running" \
+    --query 'Reservations[0].Instances[0].InstanceId' \
+    --output text
+```
+
+To minimize copy/paste errors, assign the value directly using this command.
+
+```shell
+export INSTANCE_ID=$(aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --filters "Name=instance-state-name, Values=running" \
+    --query 'Reservations[0].Instances[0].InstanceId' \
+    --output text)
+```
+
+---
+
+> [!Pro Tip]
+> 
+> The linux `history` feature has a shortcut that repeats the last command. The shortcut is: `!!`
+> 
+>  At the command line, type `!!` and press enter.  The previous command will reappear.
+>  
+> If this was the last command typed:
+> 
+> ```shell
+> aws ec2 describe-instances \
+>   --profile $AWS_PROFILE \
+>   --region $AWS_REGION \
+>   --filters "Name=instance-state-name, Values=running" \
+>   --query 'Reservations[0].Instances[0].InstanceId' \
+>   --output text
+>   ```
+> 
+  >  Use `!!` to set a shell variable:
+>  
+>  ```shell
+>  export INSTANCE_ID=$(!!)
+>  ```
+>  
+>  _It looks like laziness but, in reality, it is efficiency!_
+
+---
+
+Verify the value of INSTANCE_ID: 
+
+```shell
+echo $INSTANCE_ID`
+```
+
+### Get the Security Group ID
+
+This command returns a list of security groups attached to the EC2 instance.
+
+The `--query` parameter includes formatting to make the output clear.
+
+```shell
+aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --instance-id $INSTANCE_ID \
+    --query 'Reservations[0].Instances[0].{
+        SecurityGroups: SecurityGroups[*].GroupId
+        }' \
+    --output yaml
+```
+
+For this exercise, only one security group is needed.
+
+Update the `--query` parameter to select the first (possibly only) security group by replacing the asterisk (`*`) in `SecurityGroups` with a `0`.
+
+Remove the formatting too.
+
+```shell
+aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --instance-id $INSTANCE_ID \
+    --query 'Reservations[0].Instances[0].SecurityGroups[0].GroupId' \
+    --output text
+```
+
+### Assign the Security Group ID to a Shell Variable
+
+Either use the `!!` trick or copy/paste the command into a variable assignment statement.
+
+```shell
+export AWS_SG_ID=$(aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --instance-id $INSTANCE_ID \
+    --query 'Reservations[0].Instances[0].SecurityGroups[0].GroupId' \
+    --output text)
+```
+
+### Check the Existing Security Group Rules
+
+To get information about security groups, use `describe-security-groups`.
+
+This example displays information about inbound (ingress) traffic for the AWS security group saved in `AWS_SG_ID`.
+
+The output includes port information, protocols, and sources.
+
+```shell
+aws ec2 describe-security-groups \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --group-ids $AWS_SG_ID \
+    --query 'SecurityGroups[*].{
+        GroupId: GroupId,
+        InboundRules: IpPermissions[*].{
+            Port: ToPort,
+            Protocol: IpProtocol,
+            Source: join(`, `, [IpRanges[].CidrIp, UserIdGroupPairs[].GroupId][])
+        }
+    }' \
+    --output yaml
+```
+
+The `--query` paramater use `JMESPATH` to parse/format the output.
+
+- `GroupId`: Returns the security group ID.
+- `InboundRules`: An array of the security group’s inbound rules.
+
+For each inbound rule, it displays:
+
+- `Port`: The destination port number allowed by this rule (`ToPort`).
+- `Protocol`: The IP protocol for the rule (`IpProtocol`), like `TCP` or `UDP`.
+- `Source`: The allowed source IP ranges or security group IDs.
+
+The `Source` field uses a `join` function to combine:
+
+- `IpRanges[].CidrIp`: The CIDR IP ranges allowed by this rule.
+- `UserIdGroupPairs[].GroupId`: Other security groups allowed by this rule.
+
+### Modify the Security Group
+
+This is the actual "attack."
+
+These commands open specific ports to all IP addresses, which will trigger an Indicator of Attack (IOA).
+
+---
+
+> [!Caution]
+> 
+> These security group modifications allow ☢️ **unrestricted access** ☢️ to the public Internet.
+>  
+>  After testing, revert these settings as quickly as possible.
+
+---
+
+When the command is successful, this is part of the output: `Return: true`.
+
+#### Allow SSH (Port 22)
+
+```shell
+aws ec2 authorize-security-group-ingress \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --group-id $AWS_SG_ID \
+    --protocol tcp \
+    --port 22 \
+    --cidr 0.0.0.0/0
+```
+
+#### Allow RDP (Port 3389)
+
+```shell
+aws ec2 authorize-security-group-ingress \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --group-id $AWS_SG_ID \
+    --protocol tcp \
+    --port 3389 \
+    --cidr 0.0.0.0/0
+```
+
+#### Optional: Allow a Random Port
+
+As a test, pick a random port number. For example, use the current four-digit year or the current date.
+
+```shell
+aws ec2 authorize-security-group-ingress \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --group-id $AWS_SG_ID \
+    --protocol tcp \
+    --port 1108 \
+    --cidr 0.0.0.0/0
+```
+
+### Verify the Changes
+
+Use the `describe-security-groups` to display the security group's inbound rules.
+
+```shell
+aws ec2 describe-security-groups \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --group-ids $AWS_SG_ID \
+    --query 'SecurityGroups[*].{
+        GroupId: GroupId,
+        InboundRules: IpPermissions[*].{
+            Port: ToPort,
+            Protocol: IpProtocol,
+            Source: join(`, `, [IpRanges[].CidrIp, UserIdGroupPairs[].GroupId][])
+        }
+    }' \
+    --output yaml
+```
+
+### Optional: View all EC2 instances that use this Security Group
+
+As a bit of _bonus_ reconnaissance, this command displays all EC2 instances using that security group.
+
+```shell
+aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --filters "Name=instance.group-id,Values=$AWS_SG_ID" \
+    --query 'Reservations[*].Instances[*].InstanceId' \
+    --output text
+```
+
+Here's the same command with more details about the instance(s).
+
+```shell
+aws ec2 describe-instances \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --filters "Name=instance.group-id,Values=$AWS_SG_ID" \
+    --query 'Reservations[*].Instances[*].{
+        Name: (Tags[?Key==`Name`] | [0].Value) || `No Name`,
+        PublicIpAddress: PublicIpAddress,
+        PrivateIpAddress: PrivateIpAddress,
+        SecurityGroups: SecurityGroups[*].GroupId,
+        InstanceId: InstanceId
+    }' \
+    --output yaml
+```
+
+### Revert Security Group Changes
+
+These commands revoke the access granted in the previous steps and restores the security group’s original settings.
+
+The AWS CLI command is: `revoke-security-group-ingress`
+
+#### Revoke SSH: Port 22
+
+```shell
+aws ec2 revoke-security-group-ingress \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --group-id $AWS_SG_ID \
+    --protocol tcp \
+    --port 22 \
+    --cidr 0.0.0.0/0
+```
+
+#### Revoke RDP: Port 3389
+
+```shell
+aws ec2 revoke-security-group-ingress \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --group-id $AWS_SG_ID \
+    --protocol tcp \
+    --port 3389 \
+    --cidr 0.0.0.0/0
+```
+
+#### Revoke Random/Optional Port
+
+```shell
+aws ec2 revoke-security-group-ingress \
+    --profile $AWS_PROFILE \
+    --region $AWS_REGION \
+    --group-id $AWS_SG_ID \
+    --protocol tcp \
+    --port 1108 \
+    --cidr 0.0.0.0/0
+```
+
+As with the authorize command, when successful, the output will contain: `Return: true`.
+
