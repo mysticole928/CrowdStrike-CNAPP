@@ -6,12 +6,12 @@ This simple query lists default (CrowdStrike provided) CSPM policy violations th
 
 ```
 "#event_simpleName"=~/^cspm_policy_\d+/
-	| "nist_benchmark_ids" = * 
+  | "nist_benchmark_ids" = * 
   | !in(field=nist_benchmark_ids, values=[null, ""])
   | nist_benchmark_ids = /^\{(?<ids>.+)}/
   | splitString(by=",", field=ids, as=nist_ids)
-	| groupBy([CloudPlatform, PolicyId, policy_severity, PolicyStatement, nist_benchmark_ids], function=collect(ResourceId))
-	| sort([policy_severity,PolicyID], order=[desc, asc], limit=20000) 
+  | groupBy([CloudPlatform, PolicyId, policy_severity, PolicyStatement, nist_benchmark_ids], function=collect(ResourceId))
+  | sort([policy_severity,PolicyID], order=[desc, asc], limit=20000) 
 ```
 
 The `#event_simpleName` query uses regex.  Specifying a number using `\d+` instead of the `*` ensures the query is efficient.
@@ -33,14 +33,14 @@ The custom policy is attached to IAM and its rules fairly simple.  It searches f
 
 ```
 #event_simpleName = "custom_detection_policy" 
-| policy_id = "1001"
-| sort(ResourceId, order=asc) 
-| parseJson(ResourceAttributes, prefix=ResourceAttributes.)
-| parseTimestamp(field="ResourceAttributes.Access Key 1 Last Rotated", as="ResourceAttributes.Access Key 1 Last Rotated.timestamp", timezoneAs="ResourceAttributes.Access Key 1 Last Rotated.timezone")
-| keyTimestamp := getField("ResourceAttributes.Access Key 1 Last Rotated.timestamp")
-| keyAge := now() - keyTimestamp
-| keyAgeInDays := formatDuration("keyAge", precision=2)
-| groupBy([policy_id, policy_statement, service, region, ResourceId, keyAgeInDays])
+  | policy_id = "1001"
+  | sort(ResourceId, order=asc) 
+  | parseJson(ResourceAttributes, prefix=ResourceAttributes.)
+  | parseTimestamp(field="ResourceAttributes.Access Key 1 Last Rotated", as="ResourceAttributes.Access Key 1 Last Rotated.timestamp", timezoneAs="ResourceAttributes.Access Key 1 Last Rotated.timezone")
+  | keyTimestamp := getField("ResourceAttributes.Access Key 1 Last Rotated.timestamp")
+  | keyAge := now() - keyTimestamp
+  | keyAgeInDays := formatDuration("keyAge", precision=2)
+  | groupBy([policy_id, policy_statement, service, region, ResourceId, keyAgeInDays])
 ```
 
 In the data is a field called `ResourceAttributes`.  It's formatted as in-line `JSON`.  
