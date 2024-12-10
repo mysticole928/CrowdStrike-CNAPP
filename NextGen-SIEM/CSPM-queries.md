@@ -5,8 +5,8 @@
 This simple query lists default (CrowdStrike provided) CSPM policy violations that contain NIST benchmarks.
 
 ```
-"#event_simpleName"=~/^cspm_policy_\d+/
-  | "nist_benchmark_ids" = * 
+#event_simpleName=~/^cspm_policy_\d+/
+  | nist_benchmark_ids = * 
   | !in(field=nist_benchmark_ids, values=[null, ""])
   | nist_benchmark_ids = /^\{(?<ids>.+)}/
   | splitString(by=",", field=ids, as=nist_ids)
@@ -19,11 +19,11 @@ The `#event_simpleName` query uses regex.  Specifying a number using `\d+` inste
 ## Search AWS for Instances with Public IP Addresses
 
 ```
-"aws_public_ip_address"= * and not "aws_public_ip_address" = "null"
+aws_public_ip_address= * and not aws_public_ip_address = "null"
 | groupBy([aws_instance_name,aws_public_dns_name, aws_public_ip_address, aws_region], function=collect(aws_region))
 ```
 
-The `and not "aws_public_ip_address" = "null"` avoids false positives where `null` is the value.
+The `and not aws_public_ip_address = "null"` avoids false positives where `null` is the value.
 
 ## Query a Custom CSPM Policy
 
