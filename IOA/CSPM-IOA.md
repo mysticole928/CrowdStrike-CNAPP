@@ -286,7 +286,7 @@ aws ec2 describe-security-groups \
     --output yaml
 ```
 
-The `--query` paramater use `JMESPATH` to parse/format the output.
+The `--query` parameter uses `JMESPATH` to parse/format the output.
 
 - `GroupId`: Returns the security group ID.
 - `InboundRules`: An array of the security group’s inbound rules.
@@ -304,9 +304,7 @@ The `Source` field uses a `join` function to combine:
 
 ### Modify the Security Group
 
-This is the actual "attack."
-
-These commands open specific ports to all IP addresses, which will trigger an Indicator of Attack (IOA).
+These commands open specific ports to the public Internet and will trigger the IOA.
 
 ---
 
@@ -414,6 +412,8 @@ These commands revoke the access granted in the previous steps and restores the 
 
 The AWS CLI command is: `revoke-security-group-ingress`
 
+As with the authorize command, when successful, the output contains `Return: true`.
+
 #### Revoke SSH: Port 22
 
 ```shell
@@ -449,6 +449,4 @@ aws ec2 revoke-security-group-ingress \
     --port 1108 \
     --cidr 0.0.0.0/0
 ```
-
-As with the authorize command, when successful, the output contains: `Return: true`.
 
