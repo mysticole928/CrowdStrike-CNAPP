@@ -1,5 +1,19 @@
 #!/bin/zsh
 
+# Author: Stephen Cole
+# Date: 2025-01-30
+#
+# This script checks to see if the falcon-container-sensor-pull.sh script is installed.  
+#
+# If it is, it will check the version number on GitHub and compare it to the locally installed version.  When a never version is available, it will download and install it.
+#
+# If the falcon-container-sensor-pull.sh script is missing, it will generate a prompt asking whether or not to install.
+#
+# Save this in a directory such as ~/.scripts
+# Make it executable with chmod
+# Create an alias: 
+# - alias update-falcon='~/.scripts/update_falcon_pull.zsh'
+
 # URL of the Falcon Container Sensor Pull script
 GITHUB_URL="https://raw.githubusercontent.com/CrowdStrike/falcon-scripts/main/bash/containers/falcon-container-sensor-pull/falcon-container-sensor-pull.sh"
 FILENAME=${GITHUB_URL:t}  # Extract filename from URL
