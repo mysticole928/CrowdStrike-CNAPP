@@ -214,7 +214,7 @@ export INSTANCE_ID=$(aws ec2 describe-instances \
 Verify the value of INSTANCE_ID: 
 
 ```shell
-echo $INSTANCE_ID`
+echo $INSTANCE_ID
 ```
 
 ### Get the Security Group ID
