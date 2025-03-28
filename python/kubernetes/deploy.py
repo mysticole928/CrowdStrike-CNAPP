@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
 # Author: Stephen Cole
-# Version: 1.1
-# Changes: 2025-03-28 - Added docstrings, fixed typos, and added variable to capture script name for usage info
-# 
+# Version: 1.1.1
+#
 # Script to create/delete/verify Kubernetes deployments.
 # Change the variable DEFAULT_FILE_PATTERN as needed.
+#
+# 1.1.1 Update fixed an issue with displaying the file path in the usage message.
 
-import glob
 import argparse
+import glob
+import os
 import yaml
 import sys
 
@@ -16,8 +18,7 @@ from kubernetes import client, config, utils
 from kubernetes.client.rest import ApiException
 
 # Change this variable to update the default file pattern for YAML files.
-
-DEFAULT_FILE_PATTERN = "*.yaml"
+DEFAULT_FILE_PATTERN = "stratoshopper-*.yaml"
 
 def create_deployments(file_pattern):
     """
@@ -49,7 +50,7 @@ def create_deployments(file_pattern):
 
 def delete_deployments(file_pattern):
     """
-    Delete Kubernetes resources defined in YAML files matching the file pattern.
+    Delete Kubernetes resources defined in YAML files matching the given file pattern.
 
     Parameters:
         file_pattern (str): Glob pattern to match YAML files.
@@ -170,11 +171,11 @@ def main():
     # If no action is provided, display pods and usage instructions.
     if args.action is None:
         display_all_pods()
-        script_name = sys.argv[0]
+        script_name = os.path.basename(sys.argv[0])
         print("\nNo action specified.")
         print("Usage:")
-        print(f"  {script_name} create  - Deploy resources from YAML files")
-        print(f"  {script_name} delete   - Delete resources defined in YAML files")
+        print(f"  {script_name} create - Deploy resources from YAML files")
+        print(f"  {script_name} delete - Delete resources defined in YAML files")
         return
 
     if args.action == "create":
