@@ -18,7 +18,7 @@ from kubernetes import client, config, utils
 from kubernetes.client.rest import ApiException
 
 # Change this variable to update the default file pattern for YAML files.
-DEFAULT_FILE_PATTERN = "stratoshopper-*.yaml"
+DEFAULT_FILE_PATTERN = "*.yaml"
 
 def create_deployments(file_pattern):
     """
