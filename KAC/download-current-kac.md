@@ -1,6 +1,6 @@
 # Installing the CrowdStrike Falcon KAC
 
-Updated: 2024-10-22
+Updated: 2025-05-09
 
 Disclaimer: These are my notes based on work that I've done building a training environment.  They are to be used as a reference and are *_not_* the official source of truth.
 
@@ -10,7 +10,7 @@ Here is the link to the official Falcon Container Sensor Pull Script:
 
 ## Shell Variables
 
-The command examples have be parameterized.  Here are the environmental variables that were set in advance.
+The command examples have be parameterized.  These are the environmental variables used in these examples.
 
 ```
 export FALCON_CLIENT_ID=<falcon-client-id>
@@ -34,7 +34,7 @@ export PRIVATE_REGISTRY=<url-for-container-registry>
 
 Note: `--client-id` and `--client-secret` are required.
 
-## Download Current Falcon KAC
+## Download Current Falcon KAC to Local Registry
 
 ```shell
 ./falcon-container-sensor-pull.sh \
@@ -44,7 +44,7 @@ Note: `--client-id` and `--client-secret` are required.
 --type falcon-kac
 ```
 
-Docker (or similar software) must be running.
+Docker (or similar software) must be running on the host.
 
 ## Copy the Falcon KAC to a Private Registry
 
@@ -81,12 +81,9 @@ export KAC_TAG=$(./falcon-container-sensor-pull.sh \
   --client-secret $FALCON_CLIENT_SECRET \
   --region $FALCON_CLOUD_REGION \
   --type falcon-kac \
-  --get-image-path | cut -d ':' -f 2)
+  --get-image-path | cut -d ':' -f 2) \
+  && echo "KAC Tag: $KAC_TAG"
 ```
-
-Verify the output:
-
-`echo $KAC_TAG`
 
 ### Install the Helm Chart
 
@@ -102,9 +99,9 @@ Add the CrowdStrike Helm repository:
 helm repo add crowdstrike https://crowdstrike.github.io/falcon-helm && helm repo update
 ```
 
-**Important:** Before updating the Falcon KAC, sensor, or IAR, **always** run `helm repo update` first.
+**Important:** Before updating the Falcon KAC, The Falcon container or node sensor, or IAR, **always** run `helm repo update` first.
 
-### Install the Falcon KAC
+### Install the Falcon KAC using `--set` options
 
 The Falcon KAC might not be able to read the metadata with the cluster name.
 
@@ -118,7 +115,59 @@ helm upgrade --install falcon-kac crowdstrike/falcon-kac \
      --set falcon.cid=$FALCON_CID \
      --set image.repository=$PRIVATE_REGISTRY/falcon-kac \
      --set image.tag=$KAC_TAG \
+     --set falconClientResources.limits.memory="384Mi" \
+     --set falconClientResources.requests.cpu="250m" \
+     --set falconClientResources.requests.memory="384Mi" \
+     --set falconWatcherResources.limits.memory="384Mi" \
+     --set falconWatcherResources.requests.cpu="250m" \
+     --set falconWatcherResources.requests.memory="384Mi" \
+     --set falconAcResources.limits.memory="256Mi" \
+     --set falconAcResources.requests.cpu="100m" \
+     --set falconAcResources.requests.memory="256Mi" \
      --set falcon.tags="tag-1\,tag-2\,tag-3\,tag-4"
+```
+
+### Install the Falcon KAC using a config file
+
+Example `kac-config.yaml` file
+
+```yaml
+falcon:
+  cid: ${FALCON_CID}
+  tags: "tag-1,tag-2,tag-3,tag-4"
+
+image:
+  repository: ${PRIVATE_REGISTRY}/falcon-kac
+  tag: ${KAC_TAG}
+
+falconClientResources:
+  limits:
+    memory: "384Mi"
+  requests:
+    cpu: "250m"
+    memory: "384Mi"
+
+falconWatcherResources:
+  limits:
+    memory: "384Mi"
+  requests:
+    cpu: "250m"
+    memory: "384Mi"
+
+falconAcResources:
+  limits:
+    memory: "256Mi"
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+```
+
+Command example:
+
+```shell
+helm upgrade --install falcon-kac crowdstrike/falcon-kac \
+  -n falcon-kac --create-namespace \
+  -f kac-config.yaml
 ```
 
 A message like this one will appear:
