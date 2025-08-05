@@ -49,6 +49,6 @@ The statement `parseJson(ResourceAttributes, prefix=ResourceAttributes.)` extrac
 
 The fields get the prefix: `ResourceAttributes.`
 
-These data is used to calculate the age the key and display it in the results.
+This data is used to calculate the age the key and display it in the results.
 
 
